@@ -15,7 +15,7 @@ Khazard Miner
 - Mines and banks iron ore. 
 
 Cat Grower
-- Grows your kitten
+- Grows your kitten: Feeds and Pets
 - WIP. 
 
     
