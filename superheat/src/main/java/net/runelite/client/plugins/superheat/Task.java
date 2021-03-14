@@ -4,11 +4,15 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.iutils.*;
 
 import java.util.List;
+
+import static net.runelite.client.plugins.iutils.Banks.BANK_SET;
 
 @Slf4j
 public abstract class Task
@@ -100,11 +104,11 @@ public abstract class Task
 		return;
 	}
 
+
 	public void castOnItem(WidgetItem item) {
 		targetMenu = new MenuEntry("", "", item.getId(), MenuAction.ITEM_USE_ON_WIDGET.getId(), item.getIndex(), 9764864, true);
 		superheatPlugin.timeout = 2 + tickDelay();
 		utils.oneClickCastSpell(WidgetInfo.SPELL_SUPERHEAT_ITEM, targetMenu, item.getCanvasBounds().getBounds(), sleepDelay());
-		return;
 	}
 
 	public void timeout(int item) {
@@ -117,6 +121,31 @@ public abstract class Task
 		superheatPlugin.conditionTimeout = new TimeoutUntil(
 				() -> bank.isOpen(),
 				5);
+	}
+
+	public void openBank()
+	{
+		NPC geNPC = new NPCQuery()
+				.idEquals(1634,3089,1633,1613)
+				.result(client)
+				.nearestTo(client.getLocalPlayer());
+
+		GameObject BANK = new GameObjectQuery()
+				.idEquals(BANK_SET)
+				.result(client)
+				.nearestTo(client.getLocalPlayer());
+
+
+		if (geNPC != null) {
+			utils.doNpcActionMsTime(geNPC, MenuAction.NPC_THIRD_OPTION.getId(), sleepDelay());
+		} else {
+			if (BANK != null) {
+				utils.doGameObjectActionMsTime(BANK, MenuAction.GAME_OBJECT_FOURTH_OPTION.getId(), sleepDelay());
+			}
+		}
+		superheatPlugin.conditionTimeout = new TimeoutUntil(
+				()->bank.isOpen(),
+				3);
 	}
 
 }

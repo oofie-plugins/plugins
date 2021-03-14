@@ -41,6 +41,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.iutils.ConditionTimeout;
 import net.runelite.client.plugins.smelter.tasks.*;
 import net.runelite.client.plugins.iutils.iUtils;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -141,8 +142,8 @@ public class SmelterPlugin extends Plugin
 		overlayManager.remove(overlay);
 		chinBreakHandler.stopPlugin(this);
 		startBot = false;
-		Task.usefurnce = false;
 		botTimer = null;
+		conditionTimeout = null;
 		tasks.clear();
 	}
 

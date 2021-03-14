@@ -3,12 +3,14 @@ package net.runelite.client.plugins.smelter;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.smelter.BarType;
 import net.runelite.client.plugins.iutils.*;
+import net.runelite.client.plugins.iutils.TimeoutUntil;
+import net.runelite.client.plugins.iutils.TimeoutWhile;
+
 
 import java.util.List;
 
@@ -55,7 +57,6 @@ public abstract class Task
 
 	public abstract boolean validate();
 
-	public static boolean usefurnce;
 //	public boolean openBank;
 
 	//!items
@@ -112,22 +113,17 @@ public abstract class Task
 				5);
 	}
 
-	public void timeoutBank() {
-		SmelterPlugin.conditionTimeout = new TimeoutUntil(
-				() -> bank.isOpen(),
-				7);
-	}
 
-	public void useFurnace() {
-		Widget optionMenu = client.getWidget(270, 4);
+	public void useFurnace()
+	{
 		SmelterPlugin.status = "finding furnace";
 		targetObject = obj.findNearestGameObject(16469);
 
-		if (targetObject != null && usefurnce) {
+		if (targetObject != null)
+		{
 			entry = new MenuEntry("Smelt", "<col=ffff>Furnace", targetObject.getId(), 4, targetObject.getSceneMinLocation().getX(), targetObject.getSceneMinLocation().getY(), false);
 			menu.setEntry(entry);
 			mouse.delayMouseClick(targetObject.getConvexHull().getBounds(), sleepDelay());
-			usefurnce = false;
 		}
 		SmelterPlugin.conditionTimeout = new TimeoutUntil(
 				() -> client.getLocalPlayer().getWorldLocation().equals(Furnace),
@@ -137,17 +133,16 @@ public abstract class Task
 
 	public void openBank() {
 		SmelterPlugin.status = "finding bank";
-		GameObject bank = obj.findNearestGameObject(10355);
-		entry = new MenuEntry("", "", bank.getId(), 4, bank.getSceneMinLocation().getX(),
-				bank.getSceneMinLocation().getY(), false );
-		menu.setEntry(entry);
-		mouse.delayMouseClick(bank.getConvexHull().getBounds(), sleepDelay());
-		timeoutBank();
+		GameObject BANK = obj.findNearestGameObject(10355);
+		utils.doGameObjectActionMsTime(BANK, MenuAction.GAME_OBJECT_SECOND_OPTION.getId(), sleepDelay());
+		SmelterPlugin.conditionTimeout = new TimeoutUntil(
+				() -> bank.isOpen(),
+				() -> playerUtils.isMoving(),
+				3);
 	}
 
 	public void handleLvlUp(int item) {
 		if ( inv.containsItem(item) ) {
-			usefurnce = true;
 			useFurnace();
 			SmelterPlugin.timeout = tickDelay();
 		} else {
@@ -156,25 +151,27 @@ public abstract class Task
 		}
 
 	}
-	public boolean isIdle() {
-		Widget optionMenu = client.getWidget(270, 4);
-		if (!client.getLocalPlayer().getWorldLocation().equals(Furnace)) { return false; }
-		if (optionMenu != null) { return false; }
-		return !playerUtils.isMoving() && !playerUtils.isAnimating();
-		}
-	public void handleIdle(int item) {
-		if (isIdle()) {
-			if (inv.containsItem(item)) {
-				usefurnce = true;
-				useFurnace();
-			} else {
-				openBank();
-			}
-			SmelterPlugin.conditionTimeout = new TimeoutUntil(
-					() -> playerUtils.isAnimating(),
-					() -> playerUtils.isAnimating(),
-					4);
-		}
-	}
+//	public boolean isIdle() {
+//		Widget optionMenu = client.getWidget(270, 4);
+//		if (!client.getLocalPlayer().getWorldLocation().equals(Furnace)) { return false; }
+//		if (optionMenu != null) {
+//			return false;
+//		}
+//		return !playerUtils.isMoving() && !playerUtils.isAnimating();
+//		}
+//
+//	public void handleIdle(int item) {
+//		if (isIdle()) {
+//			if (inv.containsItem(item)) {
+//				useFurnace();
+//			} else {
+//				openBank();
+//			}
+//			SmelterPlugin.conditionTimeout = new TimeoutUntil(
+//					() -> playerUtils.isAnimating(),
+//					() -> playerUtils.isAnimating(),
+//					4);
+//		}
+//	}
 
 }

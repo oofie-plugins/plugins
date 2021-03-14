@@ -8,10 +8,10 @@ import net.runelite.api.Player;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.iutils.TimeoutUntil;
 import net.runelite.client.plugins.smelter.BarType;
 import net.runelite.client.plugins.smelter.Task;
 import net.runelite.client.plugins.smelter.SmelterPlugin;
-import net.runelite.client.plugins.smelter.TimeoutUntil;
 
 import static net.runelite.client.plugins.smelter.SmelterPlugin.conditionTimeout;
 
@@ -46,7 +46,8 @@ public class BronzeMoltenTask extends Task {
             SmelterPlugin.timeout = tickDelay();
         }
 
-        if ( bank.isOpen() ) {
+        if ( bank.isOpen() )
+        {
 
             if ( inv.containsItem(bar) ) {
                 bank.depositAll();
@@ -55,7 +56,6 @@ public class BronzeMoltenTask extends Task {
                 if ( bank.contains(item1, 14) ) {
                     bank.withdrawItemAmount(item1, 14);
                     timeout(item1);
-                    SmelterPlugin.timeout = tickDelay();
                 } else {
                     utils.sendGameMessage("out of item 1");
                 }
@@ -63,13 +63,12 @@ public class BronzeMoltenTask extends Task {
             } else if ( !inv.containsItem(item2) && inv.containsItem(item1) ) {
                 if ( bank.contains(item2, 14) ) {
                     bank.withdrawAllItem(item2);
-                    SmelterPlugin.timeout = tickDelay();
+                    timeout(item2);
                 } else {
                     utils.sendGameMessage("out of item 2");
                 }
 
             } else if (inv.isFull()) {
-                usefurnce = true;
                 useFurnace();
                 SmelterPlugin.timeout = tickDelay();
             }
@@ -78,13 +77,8 @@ public class BronzeMoltenTask extends Task {
         if (lvlup != null ) {
             handleLvlUp(item1);
         }
-        // click furnace
-        Widget optionMenu = client.getWidget(270, 4);
-        if (usefurnce && optionMenu == null) {
-            useFurnace();
-            SmelterPlugin.timeout = tickDelay();
-        }
         // select bar
+        Widget optionMenu = client.getWidget(270, 4);
         if (optionMenu != null) {
             entry = new MenuEntry("", "", 1, MenuAction.CC_OP.getId(), -1, config.BarType().getParam1(), false );
             utils.doActionMsTime(entry, optionMenu.getBounds(), sleepDelay());
@@ -92,6 +86,11 @@ public class BronzeMoltenTask extends Task {
                     ()-> !inv.containsItem(item1),
                     ()-> playerUtils.isAnimating(),
                     5);
+        }
+        // click furnace
+        if (optionMenu == null && inv.containsItem(item1) && !bank.isOpen()) {
+            useFurnace();
+            SmelterPlugin.timeout = tickDelay();
         }
 
     }

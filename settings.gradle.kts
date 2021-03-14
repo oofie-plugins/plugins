@@ -27,9 +27,11 @@ rootProject.name = "Oofie Plugins"
 //
 include(":smelter")
 include(":superheat")
-include(":khazardminer")
+//include(":khazardminer") defunct old
 //include(":glassmaker") No longer updated - added to smelter
-include("catgrower")
+//include("catgrower") defunct old
+include("oofiekhazardminer")
+include(":oofiekittengrower")
 
 
 for (project in rootProject.children) {

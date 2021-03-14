@@ -6,10 +6,10 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.iutils.TimeoutUntil;
 import net.runelite.client.plugins.smelter.BarType;
 import net.runelite.client.plugins.smelter.Task;
 import net.runelite.client.plugins.smelter.SmelterPlugin;
-import net.runelite.client.plugins.smelter.TimeoutUntil;
 
 import static net.runelite.client.plugins.smelter.SmelterPlugin.conditionTimeout;
 
@@ -53,7 +53,6 @@ public class AdamTask extends Task
                 if ( bank.contains(adam, 4) ) {
                     bank.withdrawItemAmount(adam, 4);
                     timeout(adam);
-                    SmelterPlugin.timeout = tickDelay();
                 } else {
                     utils.sendGameMessage("out of item 1");
                 }
@@ -61,13 +60,12 @@ public class AdamTask extends Task
             } else if ( !inv.containsItem(coal) && inv.containsItem(adam) ) {
                 if ( bank.contains(coal, 24) ) {
                     bank.withdrawAllItem(coal);
-                    SmelterPlugin.timeout = tickDelay();
+                    timeout(coal);
                 } else {
                     utils.sendGameMessage("out of item 2");
                 }
 
             } else if (inv.isFull()) {
-                usefurnce = true;
                 useFurnace();
                 SmelterPlugin.timeout = tickDelay();
             }
@@ -76,13 +74,9 @@ public class AdamTask extends Task
         if (lvlup != null ) {
             handleLvlUp(steel);
         }
-        // click furnace
-        Widget optionMenu = client.getWidget(270, 4);
-        if (usefurnce && optionMenu == null) {
-            useFurnace();
-            SmelterPlugin.timeout = tickDelay();
-        }
+
         // select bar
+        Widget optionMenu = client.getWidget(270, 4);
         if (optionMenu != null) {
             entry = new MenuEntry("", "", 1, MenuAction.CC_OP.getId(), -1, config.BarType().getParam1(), false );
             utils.doActionMsTime(entry, optionMenu.getBounds(), sleepDelay());
@@ -90,6 +84,11 @@ public class AdamTask extends Task
                     ()-> !inv.containsItem(adam),
                     ()-> playerUtils.isAnimating(),
                     5);
+        }
+        // click furnace
+        if (optionMenu == null && inv.containsItem(adam) && !bank.isOpen()) {
+            useFurnace();
+            SmelterPlugin.timeout = tickDelay();
         }
 
     }

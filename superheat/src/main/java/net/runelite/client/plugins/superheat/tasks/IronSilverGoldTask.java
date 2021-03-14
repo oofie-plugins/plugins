@@ -39,9 +39,7 @@ public class IronSilverGoldTask extends Task{
 
         if (!inventory.containsItem(ore)  && !bank.isOpen()) {
             superheatPlugin.status = "finding bank";
-            GameObject bank = object.findNearestBank();
-            utils.doGameObjectActionMsTime(bank, MenuAction.GAME_OBJECT_FIRST_OPTION.getId(), sleepDelay());
-            timeoutBank();
+            openBank();
         }
 
         if (bank.isOpen())

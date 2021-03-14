@@ -2,9 +2,9 @@ package net.runelite.client.plugins.smelter.tasks;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.plugins.smelter.ConditionTimeout;
+import net.runelite.client.plugins.iutils.ConditionTimeout;
+import net.runelite.client.plugins.iutils.TimeoutWhile;
 import net.runelite.client.plugins.smelter.Task;
-import net.runelite.client.plugins.smelter.TimeoutWhile;
 import net.runelite.client.plugins.smelter.SmelterPlugin;
 
 import java.util.concurrent.Callable;
