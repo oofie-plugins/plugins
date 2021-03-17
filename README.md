@@ -1,25 +1,23 @@
 # Oofie Plugins
-
+Molten Glass Maker
+- Start in Edgeville bank. Have Buckets of Sand and Soda Ash.
+- Bugs
+    - Run being turned on while making glass will cause the bot to get stuck in "Animating"
+   
 Smelter
 - Start in Edgeville bank. Have required ores.
-- Also makes molten glass
-
+- Bugs
+    - Withdrawing Bronze bars only withdraws copper ore.
 
 Superheat
-- Start near a Bank booth or GE. Have Fire Staff/Tome of fire + Nature runes. Have required ores.
-- Supports ONLY NATURE RUNES IN INVENTORY.
+- Start near a BANK BOOTH. Have Fire Staff/Tome of fire + Nature runes. Have required ores.
+- Need to add Ores other than Silver, Gold, Iron.
 
 Khazard Miner
-- start near iron ore or bank
-- Mines and banks iron ore. 
-
-Cat Grower WIP
-- Grows your kitten: Feeds and Pets
-- > ::pet     pets cat
-- > ::feed   feeds  cat
-- > ::pick   picks cat up
-- > ::call    calls cat if too far
-
+- Start at Fishing Trawler Deposit Box or 3 Iron ore spot further south.
+- Mines and banks iron ore. Why would you want to mine here???
+- Bugs
+    - Useless.
     
     
     
@@ -33,9 +31,9 @@ You will need to add **three** repositories. Mine, illumines, and Owains.
 
 Mine:
 
-- **Owner:** oofie-plugins
+- **Owner:** MeApeSmallBrain
 
-- **Name:** plugins
+- **Name:** oofie-plugins
 
 illumine's:
 
@@ -45,6 +43,6 @@ illumine's:
 
 owain's:
 
-- **Owner:** Owain94
+- **Owner:** illumineawake
 
-- **Name:** OpenOSRS-external-plugins-hosting
+- **Name:** illu-plugins

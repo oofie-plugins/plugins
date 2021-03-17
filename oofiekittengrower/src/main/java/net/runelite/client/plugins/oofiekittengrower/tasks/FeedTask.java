@@ -33,10 +33,11 @@ public class FeedTask extends Task {
         NPC kitten = npc.findNearestNpc("Kitten"); //Using NPC String name to avoid making list of all the Kittens
         WidgetItem catfood = inventory.getWidgetItem(config.catFood());
 
-        if (kitten != null)
+        if (kitten != null) //make sure kitten exists
         {
-            if (client.getLocalPlayer().getWorldLocation().distanceTo(kitten.getWorldLocation()) > 2) {
-                pssPssPss(); //call kitten
+            if (client.getLocalPlayer().getWorldLocation().distanceTo(kitten.getWorldLocation()) > 2)
+            {
+                pssPssPss(); //call kitten if too far
                 return;
             } else {
                 if (inventory.containsItem(config.catFood())) //If we have food
@@ -54,18 +55,28 @@ public class FeedTask extends Task {
                         OofieKittenGrowerPlugin.needToFeed = false;
                     }
                 }
+                //OTHERWISEEEEEEEE
+                else if (!inventory.containsItem(config.catFood())) //If we don't have any food, pick up cat and shutdown
+                {
+                    targetMenu = new MenuEntry("", "", kitten.getIndex(), MenuAction.NPC_FIRST_OPTION.getId(), 0, 0, false);
+                    utils.doActionMsTime(targetMenu, new Point(0, 0),  sleepDelay());
+                    OofieKittenGrowerPlugin.timeout = 1 + tickDelay();
+                    OofieKittenGrowerPlugin.startBot = false;
+                    log.info("No Food in Inventory.");
+                }
+                OofieKittenGrowerPlugin.needToFeed = false;
+                log.info("false feed 3");
             }
         }
-
-        else if (!inventory.containsItem(config.catFood())) //If we don't have any food, pick up cat and shutdown
-        {
-            targetMenu = new MenuEntry("", "", kitten.getIndex(), MenuAction.NPC_FIRST_OPTION.getId(), 0, 0, false);
-            utils.doActionMsTime(targetMenu, new Point(0, 0),  sleepDelay());
-            OofieKittenGrowerPlugin.timeout = 1 + tickDelay();
-            OofieKittenGrowerPlugin.startBot = false;
-            log.info("No Food in Inventory.");
-        }
-        OofieKittenGrowerPlugin.needToFeed = false;
-        log.info("false feed 3");
+//        else if (!inventory.containsItem(config.catFood())) //If we don't have any food, pick up cat and shutdown
+//        {
+//            targetMenu = new MenuEntry("", "", kitten.getIndex(), MenuAction.NPC_FIRST_OPTION.getId(), 0, 0, false);
+//            utils.doActionMsTime(targetMenu, new Point(0, 0),  sleepDelay());
+//            OofieKittenGrowerPlugin.timeout = 1 + tickDelay();
+//            OofieKittenGrowerPlugin.startBot = false;
+//            log.info("No Food in Inventory.");
+//        }
+//        OofieKittenGrowerPlugin.needToFeed = false;
+//        log.info("false feed 3");
     }
 }

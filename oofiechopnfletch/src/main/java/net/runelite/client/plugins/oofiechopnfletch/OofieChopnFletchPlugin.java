@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.oofiekittengrower;
+package net.runelite.client.plugins.oofiechopnfletch;
 
 import com.google.inject.Injector;
 import com.google.inject.Provides;
@@ -6,28 +6,22 @@ import java.time.Duration;
 import java.time.Instant;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.Player;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.ConfigButtonClicked;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.queries.PlayerQuery;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import com.owain.chinbreakhandler.ChinBreakHandler;
-import net.runelite.client.plugins.iutils.MouseUtils;
-import net.runelite.client.plugins.iutils.NPCUtils;
-import net.runelite.client.plugins.oofiekittengrower.tasks.FeedTask;
-import net.runelite.client.plugins.oofiekittengrower.tasks.MovingTask;
-import net.runelite.client.plugins.oofiekittengrower.tasks.PetTask;
-import net.runelite.client.plugins.oofiekittengrower.tasks.TimeoutTask;
-import net.runelite.client.plugins.iutils.TimeoutUntil;
 import net.runelite.client.plugins.iutils.ConditionTimeout;
+import net.runelite.client.plugins.iutils.InventoryUtils;
+import net.runelite.client.plugins.oofiechopnfletch.tasks.*;
 import net.runelite.client.plugins.iutils.iUtils;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
@@ -36,13 +30,13 @@ import org.pf4j.Extension;
 @Extension
 @PluginDependency(iUtils.class)
 @PluginDescriptor(
-    name = "Oofie's Kitten Grower",
+    name = "Oofie's Chop n Fletch",
     enabledByDefault = false,
-    description = "Grows Kitty to Kat :)",
-    tags = {"kitten", "cat", "grower", "kat", "oofie"}
+    description = "Chops n Fletch n Drop",
+    tags = {"chop", "n", "fletch", "oofie"}
 )
 @Slf4j
-public class OofieKittenGrowerPlugin extends Plugin
+public class OofieChopnFletchPlugin extends Plugin
 {
     @Inject
     private Injector injector;
@@ -51,22 +45,19 @@ public class OofieKittenGrowerPlugin extends Plugin
     private Client client;
 
     @Inject
-    private OofieKittenGrowerConfig config;
+    private OofieChopnFletchConfig config;
 
     @Inject
     private OverlayManager overlayManager;
 
     @Inject
-    private OofieKittenGrowerOverlay overlay;
+    private OofieChopnFletchOverlay overlay;
 
     @Inject
     private iUtils utils;
 
     @Inject
-    private NPCUtils npc;
-
-    @Inject
-    private MouseUtils mouse;
+    private InventoryUtils inventory;
 
     @Inject
     public ChinBreakHandler chinBreakHandler;
@@ -81,9 +72,6 @@ public class OofieKittenGrowerPlugin extends Plugin
     Instant botTimer;
     Player player;
 
-    public static boolean needToFeed = false;
-    public static boolean needToPet = false;
-
     public static boolean startBot;
     public static long sleepLength;
     public static int tickLength;
@@ -92,10 +80,11 @@ public class OofieKittenGrowerPlugin extends Plugin
     public static ConditionTimeout conditionTimeout;
     public static boolean timeoutFinished;
 
+
     @Provides
-    OofieKittenGrowerConfig provideConfig(ConfigManager configManager)
+    OofieChopnFletchConfig provideConfig(ConfigManager configManager)
     {
-        return configManager.getConfig(OofieKittenGrowerConfig.class);
+        return configManager.getConfig(OofieChopnFletchConfig.class);
     }
 
     @Override
@@ -118,8 +107,9 @@ public class OofieKittenGrowerPlugin extends Plugin
         tasks.addAll(
             injector.getInstance(TimeoutTask.class),
             injector.getInstance(MovingTask.class),
-            injector.getInstance(FeedTask.class),
-            injector.getInstance(PetTask.class)
+            injector.getInstance(CutTask.class),
+            injector.getInstance(FletchTask.class),
+            injector.getInstance(DropTask.class)
         );
     }
 
@@ -130,15 +120,13 @@ public class OofieKittenGrowerPlugin extends Plugin
         chinBreakHandler.stopPlugin(this);
         startBot = false;
         botTimer = null;
-        needToFeed = false;
-        needToPet = false;
         tasks.clear();
     }
 
     @Subscribe
     private void onConfigButtonPressed(ConfigButtonClicked configButtonClicked)
     {
-        if (!configButtonClicked.getGroup().equalsIgnoreCase("OofieKittenGrower"))
+        if (!configButtonClicked.getGroup().equalsIgnoreCase("OofieChopnFletch"))
         {
             return;
         }
@@ -172,21 +160,6 @@ public class OofieKittenGrowerPlugin extends Plugin
         }
     }
 
-    @Subscribe
-    public void onChatMessage(ChatMessage event)
-    {
-        if (event.getMessage().equals("Your kitten is very hungry.") || event.getMessage().equals("Your kitten is hungry.") || event.getMessage().toLowerCase().contains("hungry")) {
-            needToFeed = true;
-            log.info("need to feed  is true");
-            return;
-        }
-        if (event.getMessage().equals("Your kitten wants attention.") || event.getMessage().contains("attention") || event.getMessage().toLowerCase().contains("attention")) {
-            needToPet = true;
-            log.info("need to pet is true");
-            return;
-        }
-    }
-
 
     @Subscribe
     private void onGameTick(GameTick event)
@@ -198,6 +171,7 @@ public class OofieKittenGrowerPlugin extends Plugin
         player = client.getLocalPlayer();
         if (client != null && player != null && client.getGameState() == GameState.LOGGED_IN)
         {
+
             if (chinBreakHandler.shouldBreak(this))
             {
                 status = "Taking a break";
@@ -237,40 +211,6 @@ public class OofieKittenGrowerPlugin extends Plugin
                 log.debug(status);
             }
             beforeLoc = player.getLocalLocation();
-        }
-    }
-
-
-    @Subscribe
-    public void onCommandExecuted(CommandExecuted event)
-    {
-        NPC kitten = npc.findNearestNpc("Kitten");
-        Widget whistle = client.getWidget(387, 8);
-
-        if (event.getCommand().equalsIgnoreCase("pet")) needToPet = true;
-        if (event.getCommand().equalsIgnoreCase("feed")) needToFeed = true;
-        if (event.getCommand().equalsIgnoreCase("pick"))
-        {
-            targetMenu = new MenuEntry("", "", kitten.getIndex(), MenuAction.NPC_FIRST_OPTION.getId(), 0, 0, false);
-            utils.doActionGameTick(targetMenu, new Point(0, 0), timeout = 2);
-        }
-
-        if (event.getCommand().equalsIgnoreCase("call"))
-        {
-            targetMenu = new MenuEntry("", "", 1, MenuAction.CC_OP.getId(), -1, 25362439, false);
-            utils.doActionMsTime(targetMenu, whistle.getBounds(), sleepLength);
-        }
-
-        if (event.getCommand().equalsIgnoreCase("trade"))
-        {
-            Player targetPlayer = new PlayerQuery()
-                    .nameContains("Legend")
-                    .result(client)
-                    .nearestTo(client.getLocalPlayer());
-            if (targetPlayer != null) {
-                targetMenu = new MenuEntry("", "", targetPlayer.getPlayerId(), MenuAction.PLAYER_FOURTH_OPTION.getId(), 0, 0, false);
-                utils.doActionMsTime(targetMenu, targetPlayer.getConvexHull().getBounds(), 50);
-            }
         }
     }
 }
