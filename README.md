@@ -14,6 +14,11 @@ Superheat
 - Start near a BANK BOOTH or at GE
 - Have Fire Staff/Tome of fire + Nature runes. Have required ores.
 
+Chop n' Fletch
+- Have knife in inventory
+- Start anywhere near trees
+- This will wander far as I have not added limits to how far it should look.
+
 Khazard Miner
 - Start at Fishing Trawler Deposit Box or 3 Iron ore spot further south.
 - Mines and banks iron ore.
