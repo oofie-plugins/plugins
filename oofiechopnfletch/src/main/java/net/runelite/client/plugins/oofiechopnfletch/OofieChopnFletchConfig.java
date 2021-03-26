@@ -233,6 +233,8 @@ public interface OofieChopnFletchConfig extends Config
         return 500;
     }
 
+
+
     @ConfigSection(
         keyName = "instructionsTitle",
         name = "Instructions",

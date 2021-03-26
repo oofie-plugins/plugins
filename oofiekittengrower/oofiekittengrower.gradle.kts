@@ -1,6 +1,6 @@
 
 
-version = "2.0.1"
+version = "2.0.3"
 
 project.extra["PluginName"] = "KittyToKat"
 project.extra["PluginDescription"] = "Pets and Feeds Kitten"
@@ -8,8 +8,6 @@ project.extra["PluginDescription"] = "Pets and Feeds Kitten"
 dependencies {
     compileOnly(group = "com.openosrs.externals", name = "iutils", version = "3.1.0+")
     compileOnly(group = "com.owain.externals", name = "chinbreakhandler", version = "+")
-    //compileOnly(project(":bodutils"))
-    //compileOnly(project(":bodbreakhandler"))
 }
 
 tasks {

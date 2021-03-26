@@ -64,7 +64,8 @@ public class PetTask extends Task {
         }
     }
 
-    private void clickKitty() {
+    private void clickKitty()
+    {
         NPC kitten = npc.findNearestNpc("Kitten");
 
         targetMenu = new MenuEntry("", "", kitten.getIndex(), 13, 0, 0, false);

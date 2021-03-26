@@ -6,9 +6,13 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.plugins.oofiechopnfletch.Task;
 import net.runelite.client.plugins.oofiechopnfletch.OofieChopnFletchPlugin;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Slf4j
 public class DropTask extends Task
 {
+    private final Set<Integer> keepItems = new HashSet<>();
 
     @Override
     public boolean validate()
@@ -29,7 +33,13 @@ public class DropTask extends Task
         Player player = client.getLocalPlayer();
         if (player != null)
         {
-            dropWood();
+            keepItems.clear(); //Clean list incase it was changed
+            keepItems.addAll(utils.stringToIntList(config.keep())); //Check list for items
+
+            if (inventory.containsItem(getCraftedItems()))
+            {
+                inventory.dropAllExcept(keepItems, true, config.dropMin(), config.dropMax());
+            }
         }
     }
 }

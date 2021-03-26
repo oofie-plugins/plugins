@@ -2,15 +2,20 @@ package net.runelite.client.plugins.oofiechopnfletch;
 
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 import javax.inject.Inject;
+
+import com.sun.source.doctree.SerialTree;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.Player;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.ConfigButtonClicked;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
@@ -21,11 +26,17 @@ import net.runelite.client.plugins.PluginDescriptor;
 import com.owain.chinbreakhandler.ChinBreakHandler;
 import net.runelite.client.plugins.iutils.ConditionTimeout;
 import net.runelite.client.plugins.iutils.InventoryUtils;
+import net.runelite.client.plugins.iutils.PlayerUtils;
 import net.runelite.client.plugins.oofiechopnfletch.tasks.*;
 import net.runelite.client.plugins.iutils.iUtils;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
+
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.util.*;
 
 @Extension
 @PluginDependency(iUtils.class)
@@ -58,6 +69,9 @@ public class OofieChopnFletchPlugin extends Plugin
 
     @Inject
     private InventoryUtils inventory;
+
+    @Inject
+    private PlayerUtils playa;
 
     @Inject
     public ChinBreakHandler chinBreakHandler;
@@ -115,14 +129,13 @@ public class OofieChopnFletchPlugin extends Plugin
 
     public void resetVals()
     {
-        log.debug("stopping Task Template plugin");
+        log.debug("stopping chop n fletch");
         overlayManager.remove(overlay);
         chinBreakHandler.stopPlugin(this);
         startBot = false;
         botTimer = null;
         tasks.clear();
     }
-
     @Subscribe
     private void onConfigButtonPressed(ConfigButtonClicked configButtonClicked)
     {
@@ -138,7 +151,7 @@ public class OofieChopnFletchPlugin extends Plugin
                 Player player = client.getLocalPlayer();
                 if (client != null && player != null && client.getGameState() == GameState.LOGGED_IN)
                 {
-                    log.info("starting Task Template plugin");
+                    log.info("starting chop n fletch");
                     loadTasks();
                     startBot = true;
                     chinBreakHandler.startPlugin(this);
@@ -158,7 +171,68 @@ public class OofieChopnFletchPlugin extends Plugin
                 resetVals();
             }
         }
+        if (configButtonClicked.getKey().equals("setHWID"))
+        {
+//            final ItemContainer inventory = client.getItemContainer(InventoryID.EQUIPMENT);
+//
+//            if (inventory == null)
+//            {
+//                log.error("CopyCS: Can't find equipment container.");
+//                return;
+//            }
+//
+//            final StringBuilder sb = new StringBuilder();
+//
+//            for (Item item : inventory.getItems())
+//            {
+//                if (item.getId() == -1 || item.getId() == 0)
+//                {
+//                    continue;
+//                }
+//
+//                sb.append(item.getId());
+//                sb.append(":");
+//                sb.append("Equip");
+//                sb.append("\n");
+//            }
+//
+//            Toolkit.getDefaultToolkit()
+//                    .getSystemClipboard()
+//                    .setContents(
+//                            new StringSelection(String.valueOf(sb)),
+//                            null
+//                    );
+
+//            Toolkit.getDefaultToolkit()
+//                    .getSystemClipboard()
+//                    .setContents(
+//                            new StringSelection(String.valueOf(client.getLocalPlayer().getWorldLocation())),
+//                            null
+//                    );
+
+            Toolkit.getDefaultToolkit()
+                    .getSystemClipboard()
+                    .setContents(
+                            new StringSelection(generateHWID()),
+                            null
+                    );
+        }
     }
+//    String hwid;
+
+
+    public static String generateHWID() {
+        try {
+            MessageDigest hash = MessageDigest.getInstance("MD5");
+            String var10000 = System.getProperty("os.name");
+            String s = var10000 + System.getProperty("os.arch") + Runtime.getRuntime().availableProcessors() + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_ARCHITECTURE") + System.getenv("PROCESSOR_ARCHITEW6432") + System.getenv("NUMBER_OF_PROCESSORS");
+            byte[] md5sum = hash.digest(s.getBytes());
+            return String.format("%032X", new BigInteger(1, md5sum));
+        } catch (NoSuchAlgorithmException var4) {
+            throw new Error("Algorithm wasn't found.", var4);
+        }
+    }
+
 
 
     @Subscribe

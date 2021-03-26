@@ -56,7 +56,7 @@ class OofieKittenGrowerOverlay extends OverlayPanel
         timeFormat = (duration.toHours() < 1) ? "mm:ss" : "HH:mm:ss";
         tableComponent.addRow("Time running:", formatDuration(duration.toMillis(), timeFormat));
 
-        tableComponent.addRow("Status:", plugin.status);
+        tableComponent.addRow("Status: ", plugin.status);
 
         TableComponent tableStatsComponent = new TableComponent();
         tableStatsComponent.setColumnAlignments(TableAlignment.LEFT, TableAlignment.RIGHT);

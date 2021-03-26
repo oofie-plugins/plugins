@@ -79,13 +79,15 @@ public abstract class Task
         Widget whistle = client.getWidget(387, 8);
         Widget warning = client.getWidget(217, 3);
 
-        if (warning != null) {
+        if (warning != null)
+        {
             continuePlayerDialog(sleepDelay());
             OofieKittenGrowerPlugin.timeout = 1;
         } else {
 
             targetMenu = new MenuEntry("", "", 1, MenuAction.CC_OP.getId(), -1, 25362439, false);
             utils.doActionMsTime(targetMenu, whistle.getBounds(), sleepDelay());
+
             OofieKittenGrowerPlugin.conditionTimeout = new TimeoutUntil(
                     () -> client.getLocalPlayer().getWorldLocation().distanceTo(kitten.getWorldLocation()) < 2,
                     3);

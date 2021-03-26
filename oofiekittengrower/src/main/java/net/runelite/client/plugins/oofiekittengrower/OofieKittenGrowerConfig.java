@@ -207,6 +207,62 @@ public interface OofieKittenGrowerConfig extends Config
     )
     default int catFood() { return 3150;}
 
+    @ConfigSection(
+            keyName = "testCommands",
+            name = "Test These First!",
+            description = "Test these first!",
+            position = 20
+    )
+    String testCommands = "testCommands";
+
+    @ConfigItem(
+            keyName = "testFeed",
+            name = "Test Feeding",
+            description = "",
+            section = "testCommands",
+            position = 100
+    )
+    default Button testFeed()
+    {
+        return new Button();
+    }
+
+    @ConfigItem(
+            keyName = "testPet",
+            name = "Test Petting kitten",
+            description = "",
+            section = "testCommands",
+            position = 100
+    )
+    default Button testPet()
+    {
+        return new Button();
+    }
+
+    @ConfigItem(
+            keyName = "testCall",
+            name = "Test Calling Cat",
+            description = "For calling cat when it's far/stuck",
+            section = "testCommands",
+            position = 100
+    )
+    default Button testCall()
+    {
+        return new Button();
+    }
+
+    @ConfigItem(
+            keyName = "testPick",
+            name = "Test Picking Up Cat",
+            description = "Pick up cat",
+            section = "testCommands",
+            position = 100
+    )
+    default Button testPick()
+    {
+        return new Button();
+    }
+
     @ConfigItem(
         keyName = "enableUI",
         name = "Enable UI",
